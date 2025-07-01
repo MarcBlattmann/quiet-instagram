@@ -17,5 +17,5 @@ Se invece non riesci a installare l'app,assicurati che Meta App Installer sia di
 
 ### Unable to do anything because of instagram popup
 Many are no longer able to log in because of the instagram popup screen. The current solution to the problem is LOG IN FROM YOUR COMPUTER AND WHEN THE MESSAGE APPEARS, PRESS START AND COMPLETE THE PROCEDURE SO THAT THE POPUP NO LONGER APPEARS. Once the procedure is complete, the popup should no longer appear on the phone and therefore restarting healthyig from the phone works correctly because you have already completed the procedure from the computer.
-### ITA il popup di instagram non ti permette di accedere
+### (ITA) il popup di instagram non ti permette di accedere
 Molti non riescono più ad accedere a causa della schermata popup di instagram. La soluzione attuale al problema è FARE LOGIN DA COMPUTER E QUANDO COMPARE IL MESSAGGIO, PREMERE SU INIZIA E COMPLETARE LA PROCEDURA IN MODO CHE IL POPUP NON COMPAIA PIU'. Una volta completata la procedura il popup non dovrebbe più comparire sul telefono e quindi riavviando healthyig da telefono funziona correttamente perchè avete già completato la procedura da computer. 
