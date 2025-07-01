@@ -1,7 +1,7 @@
 # Troubleshooting (Problemi comuni)
 Commons problems and solutions 💡
 ## Disable Meta App installer & Meta App Manager problem
-![IMG-20250326-WA0034](https://github.com/user-attachments/assets/40eab206-dfcc-44dd-b8f6-03d97f4e7798)
+<img src="https://github.com/user-attachments/assets/40eab206-dfcc-44dd-b8f6-03d97f4e7798" width="350" />
 ### The app crashes on android
 Go to settings/Applications, search for Meta App Manager and Meta App Installer, force stop and disable them. 
 Then reinstall the patched instagram or clear cache and force restart. 
@@ -12,7 +12,7 @@ Vai in impostazioni/Applicazioni, cerca Meta App Manager e Meta App Installer, f
 Successivamente, pulisci la cache e riavvia oppure reinstalla l'instagram patchato. 
 Se invece non riesci a installare l'app,assicurati che Meta App Installer sia disabilitato e che tu abbia scaricato il giusto apk per il processore del tuo telefono (vedi questo link per informarti sull'architettura del tuo telefono [link](https://www.droidviews.com/check-android-phones-processor/))
 ## Instagram popup problem
-![5990293907273009359](https://github.com/user-attachments/assets/6baf70ac-f21f-42a6-ad03-701d8c6f1118)
+<img src="https://github.com/user-attachments/assets/6baf70ac-f21f-42a6-ad03-701d8c6f1118" width="350" />
 ### Unable to do anything because of instagram popup
 Many are no longer able to log in because of the instagram popup screen. The current solution to the problem is LOG IN FROM YOUR COMPUTER AND WHEN THE MESSAGE APPEARS, PRESS START AND COMPLETE THE PROCEDURE SO THAT THE POPUP NO LONGER APPEARS. Once the procedure is complete, the popup should no longer appear on the phone and therefore restarting healthyig from the phone works correctly because you have already completed the procedure from the computer.
 ### ITA il popup di instagram non ti permette di accedere
