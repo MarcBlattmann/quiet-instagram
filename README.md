@@ -85,6 +85,15 @@ sudo echo foobar | apksigner sign --ks ./patched_instagram_key.jks --v1-signing-
 - now **Uninstall your current instagram**
 - copy `install.apk` to your phone and install it
 
+**Note for newer versions**: Newer Android apps use split APKs (e.g. version 408.0.0.51.78 contains `base.apk` and `split_config.xxhdpi.apk`). Follow the guide above for `base.apk`, then additionally sign the split config:
+```
+echo foobar | apksigner sign --ks patched_instagram_key.jks split_config.xxhdpi.apk
+```
+Install both using:
+```
+adb install-multiple install.apk split_config.xxhdpi.apk
+```
+
 # 🛠️ Contribution Guidelines
 
 ## 🚀 Best Practices

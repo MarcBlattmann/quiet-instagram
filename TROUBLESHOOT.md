@@ -1,5 +1,12 @@
 # Troubleshooting (Problemi comuni)
 Commons problems and solutions 💡
+## APK won't install - Missing split error
+If installation fails via `adb install` with:
+```
+adb: failed to install base.apk: Failure [INSTALL_FAILED_MISSING_SPLIT: Missing split for com.instagram.android]
+```
+Or Android shows "Can't install app" when installing manually, this happens with newer Instagram versions that use split APKs. You need to sign **both** `base.apk` (renamed to `install.apk` if you follow the [README instructions](README.md#build-your-own-apk)) and the split config file (e.g., `split_config.xxhdpi.apk`), then install them together. See the [note for newer versions](README.md#build-your-own-apk) in the build guide.
+
 ## Disable Meta App installer & Meta App Manager problem
 <img src="https://github.com/user-attachments/assets/40eab206-dfcc-44dd-b8f6-03d97f4e7798" width="200" />
 
