@@ -4,10 +4,10 @@
 
 | IG Version | Platform | Status | Version release date |
 |------------|----------|--------|--------|
-| ig 300.0.0.29.110 | arm64-v8a Android 9+ nodpi | ✅ Tested | 2023-09 |
-| ig 300.0.0.29.110 | armeabi-v7a Android 7+ nodpi | ✅ Tested | 2023-09 |
-| ig 300.0.0.29.110 | x86 Android 7+ nodpi | ✅ Tested | 2023-09 |
-| ig for IOS | iOS .ipa sideload | ❌ Need help | - |
+| ig 300.0.0.29.110 apk | arm64-v8a Android 9+ nodpi | ✅ Tested | 2023-09 |
+| ig 300.0.0.29.110 apk | armeabi-v7a Android 7+ nodpi | ✅ Tested | 2023-09 |
+| ig 300.0.0.29.110 apk | x86 Android 7+ nodpi | ✅ Tested | 2023-09 |
+| ig 413.0.0 ipa iOS 🍏 | ipa sideloaded on iOS using [Sidestore](https://sidestore.io/) | ✅ Tested | 2026-01 |
 
 ### Disclaimer 
 I am deeply AGAINST ANY FORM OF PIRACY!
@@ -22,7 +22,7 @@ If you want to **contribute** just spread the word or make a pull request follow
 ### Features
 
 HealthyIG is a modified version of instagram that **BLOCKS** all the toxic instagram features like
-> Checkout youtube video 📹: https://www.youtube.com/watch?v=i3DQbfRWN9s
+> Checkout youtube video for Android 📹: https://www.youtube.com/watch?v=i3DQbfRWN9s
 
 - reels
 - home page
@@ -38,10 +38,12 @@ instagram features like
 - text your friends
 - view the reels that your friend sends you
 
-The app is safe, I installed the base instagram apk from **apkmirror**, decompiled it, removed the endpoints
-for reel fetching and recompiled it. If you don't trust my `install.apk`, you can build it your own with the instructions in this repository.
+# Android section 
 
-## Requirements
+The app is safe, you can find the base instagram apk from **apkmirror**, decompile it, remove the endpoints
+for reel fetching and recompile it. You don't have to trust it, you can build it your own with the instructions in this repository.
+
+## Requirements for Android
 Requires **linux** with the following tools:
 
 - apktool (install https://apktool.org/docs/install/)
@@ -55,7 +57,7 @@ Requires **linux** with the following tools:
 **Note**: I found `com.instagram.android_version...apk` on apkmirror. In alternative you can try to [extract it from your phone](https://breakthescroll.com/block-reels-instagram/)
 
 ## Build your own apk
-- get instagram apk mirror from here https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-instagram-300-0-0-29-110-release/ (I suggest you to get a [nodpi](https://www.reddit.com/r/AndroidQuestions/comments/3tjtdg/whats_the_difference_between_downloading_a_nodpi/?rdt=33617) version and checkout your [android phone processor info](https://www.droidviews.com/check-android-phones-processor/) )
+- Get instagram apk mirror from [apkmirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-instagram-300-0-0-29-110-release/) (I suggest you to get a [nodpi](https://www.reddit.com/r/AndroidQuestions/comments/3tjtdg/whats_the_difference_between_downloading_a_nodpi/?rdt=33617) version and checkout your [android phone processor info](https://www.droidviews.com/check-android-phones-processor/) ). For extra security you can put the apk into [virustotal](https://www.virustotal.com/gui/home/upload). **It's important that you do it into a linux machine because windows's filesystem will give you problems**.
 
 ```
 # copy/rename it to ig.apk
@@ -93,6 +95,52 @@ Install both using:
 ```
 adb install-multiple install.apk split_config.xxhdpi.apk
 ```
+# iOS section 🍏
+
+The app is safe, you can find the base instagram ipa from **decrypt.day**, you can simply open it with 7z **on linux**, extract the Instagram binary and patch it with Ghidra. You don't have to trust it, you can build it your own with the instructions in this repository.
+
+> Checkout youtube video for iOS 🍏: https://youtu.be/5eCFinSWR5M
+
+## Requirements for iOS
+- linux virtual machine (for example kali-linux on vmware) with [Ghidra](https://github.com/NationalSecurityAgency/ghidra) installed
+- [Sidestore](https://sidestore.io/) installed and working on your iPhone
+- iTunes to transfer the .ipa from the pc to the iPhone
+
+## Build your own .ipa
+
+- Get instagram ipa mirror from [decrypt.day instagram](https://decrypt.day/app/id389801252) (choose tested version 413.0.0) . For extra security you can put the apk into [virustotal](https://www.virustotal.com/gui/home/upload). **It's important that you do it into a linux machine because windows's filesystem will give you problems**.
+- Open the ipa file with a zip explorer like 7z for linux, find the `/Extensions` folder and delete it (otherwise sidestore will log errors and fail to install).
+- Now find the `Instagram` binary and extract it from the ipa.
+- Open Ghidra, create a new project and import `Instagram` binary
+- Now Ghidra will prompt you to start the analysis. Select ONLY `CF strings` and `ASCII strings` for a faster analysis.
+-  Once analysis is complete look for the following strings, click right mouse button, select `Patch Data` and then replace 1 character to break the API endpoint
+```
+# strings to replace in Ghidra (for example change /clips/discover to /xlips/discover):
+
+/clips/discover/stream/
+/clips/ads_discover_sync_flow/
+/clips/discover/social/
+/clips/discover/
+/discover/interest_grid/clips/
+/clips/trends_media_feed/
+/clips/trend_only/
+clips/trending_add_yours_prompts
+/discover/chaining/
+/discover/topical_explore/
+/discover/chaining_experience_contextual_ads/
+/feed/timeline
+/feed/injected_reels_media/
+```
+- After patching the strings, go to `Export/Export Program`, select `Original file`, name it Instagram and export it.
+- Once done exporting, open again the .ipa file with a zip explorer and replace the old `Instagram` binary with the patched one.
+- Now the new .ipa is ready to be transfered to your iPhone using iTunes.
+- Once the .ipa is on your iPhone, open Sidestore, go to the App section, click on the `+` button and select the ipa.
+- You will be prompted with a request that asks if you want to keep the Extensions. It's preferred to choose `Remove Extensions`.
+- Wait for install, open it, login and you are done!
+
+### Issue with iOS ⚠️
+
+When you exit the app and swipe up to free the RAM, all data gets wiped and you loose your cached data and login session. This is an annoying problem, if you have a solution feel free to open a PR or create a discussion on how to solve the problem. For now you have to be patient and wait a bit every time you re-open the app. You don't have to reinsert the password to login because it's saved on device but it's still annoying or you are forced to keep the app in RAM. 
 
 # 🛠️ Contribution Guidelines
 
@@ -103,8 +151,10 @@ adb install-multiple install.apk split_config.xxhdpi.apk
 ## 🎯 Preferred Contributions
 | Type | Description |
 |------|------------|
-| ✅ **iOS solutons** | Solutions for iOS users, particularly sideloading `.ipa` files with detailed instructions. |
-| ✅ **Android new solutions** | Alternative methods for decompiling/sideloading on Android should be documented in separate `.md` files. |
+| ✅ **Markdown and guidelines corrections** | Well documented answers to common problems or correction to existing documentation |
+| ✅ **Test on AltStore** | test the iOS solution on alt store |
+| ✅ **Improve the iOS method** | automate the process with a script instead of manual patching with Ghidra |
+| ✅ **Solving the logout problem on iOS** | on iOS, when you swipe up and close the app, you lose the session and you have to login again if you re-open it |
 | ✅ **Discovering New API Routes** | Methods to extract routes from a decompiled APK.<br>📌 **Highly requested**: a way to get an Instagram version with an **active feed**, without "For You" suggestions and ads. |
 
 ## ❌ Things to Avoid
@@ -116,6 +166,7 @@ adb install-multiple install.apk split_config.xxhdpi.apk
 * [Block reels on Instagram – Geek approach by breakthescroll.com](https://breakthescroll.com/block-reels-instagram/)
 * [Decompile, Recompile, and Sign APKs by Example](https://umatechnology.org/decompile-recompile-and-sign-apks-by-example/)
 * [Instagram APKs on APKMirror](https://www.apkmirror.com/apk/instagram/)
+* [Instagram ipa mirrors on decrypt.day](https://decrypt.day)
 * To discover new endpoints try [ssl pinning bypass](https://github.com/Eltion/Instagram-SSL-Pinning-Bypass) or [burp](https://github.com/Nerixyz/BurpInstaTools). You can also manually decompile and search using `grep` command
 ### Similar projects
 * [Instander - alternative ig version](https://instandersapp.com/)
