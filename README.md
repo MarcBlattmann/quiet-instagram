@@ -167,7 +167,7 @@ When you exit the app and swipe up to free the RAM, all data gets wiped and you 
 * [Decompile, Recompile, and Sign APKs by Example](https://umatechnology.org/decompile-recompile-and-sign-apks-by-example/)
 * [Instagram APKs on APKMirror](https://www.apkmirror.com/apk/instagram/)
 * [Instagram ipa mirrors on decrypt.day](https://decrypt.day)
-* To discover new endpoints try [ssl pinning bypass](https://github.com/Eltion/Instagram-SSL-Pinning-Bypass) or [burp](https://github.com/Nerixyz/BurpInstaTools). You can also manually decompile and search using `grep` command
+* To discover new endpoints try [ssl pinning bypass](https://github.com/Eltion/Instagram-SSL-Pinning-Bypass) or [burp](https://github.com/Nerixyz/BurpInstaTools). You can also use [JADX](https://github.com/skylot/jadx) or [Ghidra](https://github.com/NationalSecurityAgency/ghidra) to reverse engineer.
 ### Similar projects
 * [Instander - alternative ig version](https://instandersapp.com/)
 * [DFinstagram - alternative ig version](https://www.distractionfreeapps.com/)
