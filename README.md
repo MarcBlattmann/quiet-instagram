@@ -140,7 +140,7 @@ clips/trending_add_yours_prompts
 
 ### Issue with iOS ⚠️
 
-When you exit the app and swipe up to free the RAM, all data gets wiped and you loose your cached data and login session. This is an annoying problem, if you have a solution feel free to open a PR or create a discussion on how to solve the problem. For now you have to be patient and wait a bit every time you re-open the app. You don't have to reinsert the password to login because it's saved on device but it's still annoying or you are forced to keep the app in RAM. 
+When you exit the app and swipe up to free the RAM, all data gets wiped and you loose your cached data and login session. This is an annoying problem, if you have a solution feel free to open a PR or create a discussion on how to solve the problem. For now you have to be patient and wait a bit every time you re-open the app. You don't have to reinsert the password to login because it's saved on device but it's still annoying or you are forced to keep the app in RAM. [Issue here](https://github.com/AlessandroBonomo28/HealthyIG/issues/7)
 
 # 🛠️ Contribution Guidelines
 
