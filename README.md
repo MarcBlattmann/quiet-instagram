@@ -17,7 +17,7 @@ the original author of `script.sh` is [breakthescroll.com](https://breakthescrol
 
 - **The older the ig version, the higher the risk of missing official instagram security updates**
 ### Mission 🌿
-**The mission** is is to **prevent scrolling and empower the user** since Meta doesn't allow you to deactivate reels.
+**The mission** is to **prevent scrolling and empower the user** since Meta doesn't allow you to deactivate reels.
 If you want to **contribute** just spread the word or make a pull request following the **contribution guidelines** at the end of the page.
 ### Features
 
@@ -140,7 +140,7 @@ clips/trending_add_yours_prompts
 
 ### Issue with iOS ⚠️
 
-When you exit the app and swipe up to free the RAM, all data gets wiped and you loose your cached data and login session. This is an annoying problem, if you have a solution feel free to open a PR or create a discussion on how to solve the problem. For now you have to be patient and wait a bit every time you re-open the app. You don't have to reinsert the password to login because it's saved on device but it's still annoying or you are forced to keep the app in RAM. [Issue here](https://github.com/AlessandroBonomo28/HealthyIG/issues/7)
+When you exit the app and swipe up to free the RAM, all data gets wiped and you lose your cached data and login session. This is an annoying problem, if you have a solution feel free to open a PR or create a discussion on how to solve the problem. For now you have to be patient and wait a bit every time you re-open the app. You don't have to reinsert the password to login because it's saved on device but it's still annoying or you are forced to keep the app in RAM. [Issue here](https://github.com/AlessandroBonomo28/HealthyIG/issues/7)
 
 # 🛠️ Contribution Guidelines
 
@@ -173,7 +173,7 @@ When you exit the app and swipe up to free the RAM, all data gets wiped and you 
 * [DFinstagram - alternative ig version](https://www.distractionfreeapps.com/)
 * many more
 # Donate 🎁
-If this improves your life you can [buy me a coffe☕](https://buymeacoffee.com/servizibon0) With your support, I can continue to provide valuable programming tutorials and insights
+If this improves your life you can [buy me a coffee☕](https://buymeacoffee.com/servizibon0) With your support, I can continue to provide valuable programming tutorials and insights
 
 ![ggJxiFC4fys-HD](https://github.com/user-attachments/assets/0ff89cc0-c1f8-4356-a0bc-23d594b99df2)
 
