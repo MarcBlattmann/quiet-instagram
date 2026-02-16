@@ -28,7 +28,8 @@ replacements["feed/timeline/\""]="\""
 
 ### Reels
 replacements["\"clips/discover/\""]="\"\""
-#replacements["\"clips/discover/social/\""]="\"\"" # removes reels liked by friends
+# clips/discover/social removes reels liked by friends
+replacements["\"clips/discover/social/\""]="\"\"" 
 replacements["\"discover/explore_clips/\""]="\"\""
 replacements["\"clips/discover/stream/\""]="\"\""
 #replacements["\"clips/\""]="\"\""
