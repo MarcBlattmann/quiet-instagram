@@ -44,7 +44,7 @@ The app is safe, you can find the base instagram apk from **apkmirror**, decompi
 for reel fetching and recompile it. You don't have to trust it, you can build it your own with the instructions in this repository.
 
 ## Requirements for Android
-Requires **linux or WSL** detailed guide [here](https://github.com/AlessandroBonomo28/HealthyIG/GUIDE_WSL.md). The following tools are required:
+Requires **linux or WSL** detailed guide [here](https://github.com/AlessandroBonomo28/HealthyIG/blob/branch/GUIDE_WSL.md). The following tools are required:
 
 - apktool (install https://apktool.org/docs/install/)
 - zipalign (`sudo apt install zipalign -y`)
