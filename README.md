@@ -169,7 +169,7 @@ When you exit the app and swipe up to free the RAM, all data gets wiped and you 
 * [Instagram ipa mirrors on decrypt.day](https://decrypt.day)
 * To discover new endpoints try [ssl pinning bypass](https://github.com/Eltion/Instagram-SSL-Pinning-Bypass) or [burp](https://github.com/Nerixyz/BurpInstaTools). You can also use [JADX](https://github.com/skylot/jadx) or [Ghidra](https://github.com/NationalSecurityAgency/ghidra) to reverse engineer.
 ### Similar projects
-* [Instander - alternative ig version](https://instandersapp.com/)
+* [SC insta](https://github.com/SoCuul/SCInsta)
 * [DFinstagram - alternative ig version](https://www.distractionfreeapps.com/)
 * many more
 # Donate 🎁
