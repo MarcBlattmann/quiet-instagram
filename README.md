@@ -106,7 +106,7 @@ The app is safe, you can find the base instagram ipa from **decrypt.day**, you c
 - [Sidestore](https://sidestore.io/) installed and working on your iPhone
 - iTunes to transfer the .ipa from the pc to the iPhone
 
-> Setup sidestore app autorefresh: https://techybuff.com/refresh-sidestore-sideloaded-automode/
+> Setup sidestore app autorefresh: https://www.youtube.com/watch?v=hB2h1H2guEA
 
 ## Build your own .ipa
 
