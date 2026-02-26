@@ -164,7 +164,8 @@ When you exit the app and swipe up to free the RAM, all data gets wiped and you 
 - ❌ Avoid unnecessary modifications that drastically change existing code.
 
 # Helpful resources
-* Checkout [troubleshoot guide](TROUBLESHOOT.md), you may find the solution to your problem 
+* Checkout [troubleshoot guide](TROUBLESHOOT.md), you may find the solution to your problem
+* Healthy IG [docker version](https://github.com/FedericoCalzoni/healthyig_docker)
 * [Block reels on Instagram – Geek approach by breakthescroll.com](https://breakthescroll.com/block-reels-instagram/)
 * [Decompile, Recompile, and Sign APKs by Example](https://umatechnology.org/decompile-recompile-and-sign-apks-by-example/)
 * [Instagram APKs on APKMirror](https://www.apkmirror.com/apk/instagram/)
