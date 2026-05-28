@@ -4,9 +4,9 @@
 
 | IG Version | Platform | Status | Version release date |
 |------------|----------|--------|--------|
-| ig 300.0.0.29.110 apk | arm64-v8a Android 9+ nodpi | ✅ Tested | 2023-09 |
-| ig 300.0.0.29.110 apk | armeabi-v7a Android 7+ nodpi | ✅ Tested | 2023-09 |
-| ig 300.0.0.29.110 apk | x86 Android 7+ nodpi | ✅ Tested | 2023-09 |
+| ig 430.0.0.53.80 apk | arm64-v8a Android 9+ nodpi | ✅ Tested | 2026-05 |
+| ig 300.0.0.29.110 apk | armeabi-v7a Android 7+ nodpi | ❌ Outdated | 2023-09 |
+| ig 300.0.0.29.110 apk | x86 Android 7+ nodpi | ❌ Outdated | 2023-09 |
 | ig 413.0.0 ipa iOS 🍏 | ipa sideloaded on iOS using [Sidestore](https://sidestore.io/) | ✅ Tested | 2026-01 |
 
 ### Disclaimer 
@@ -57,7 +57,7 @@ Requires **linux or WSL** detailed guide [here](https://github.com/AlessandroBon
 **Note**: I found `com.instagram.android_version...apk` on apkmirror. In alternative you can try to [extract it from your phone](https://breakthescroll.com/block-reels-instagram/)
 
 ## Build your own apk
-- Get instagram apk mirror from [apkmirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-instagram-300-0-0-29-110-release/) (I suggest you to get a [nodpi](https://www.reddit.com/r/AndroidQuestions/comments/3tjtdg/whats_the_difference_between_downloading_a_nodpi/?rdt=33617) version and checkout your [android phone processor info](https://www.droidviews.com/check-android-phones-processor/) ). For extra security you can put the apk into [virustotal](https://www.virustotal.com/gui/home/upload). **It's important that you do it into a linux machine because windows's filesystem will give you problems**.
+- Get instagram apk mirror from [apkmirror](https://www.apkmirror.com/apk/instagram/instagram-instagram/instagram-430-0-0-53-80-release/instagram-430-0-0-53-80-16-android-apk-download/) (I suggest you to get a [nodpi](https://www.reddit.com/r/AndroidQuestions/comments/3tjtdg/whats_the_difference_between_downloading_a_nodpi/?rdt=33617) version and checkout your [android phone processor info](https://www.droidviews.com/check-android-phones-processor/) ). For extra security you can put the apk into [virustotal](https://www.virustotal.com/gui/home/upload). **It's important that you do it into a linux machine because windows's filesystem will give you problems**.
 
 ```
 # copy/rename it to ig.apk
@@ -71,7 +71,7 @@ sudo chmod +x script.sh
 sudo ./script.sh
 
 # recompile the apk
-sudo apktool b -r -f ig_plain
+sudo apktool b -f ig_plain
 
 sudo cp ig_plain/dist/ig.apk patched.apk
 
