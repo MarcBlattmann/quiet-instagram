@@ -121,7 +121,7 @@ probe() {
     if [ -d "$HOME/storage/downloads" ]; then
         printf '%-12s %s\n' "downloads:" "ok"
         printf '\nCandidate apks in Downloads:\n'
-        find "$HOME/storage/downloads" -maxdepth 2 -type f \
+        find -L "$HOME/storage/downloads" -maxdepth 2 -type f \
             \( -iname "*instagram*.apk*" -o -iname "ig.apk" \) 2>/dev/null \
             | sed 's/^/  /' || true
     else
@@ -148,7 +148,7 @@ if [ -z "$input_apk" ]; then
         die "~/storage/downloads not found. Run 'termux-setup-storage' first, or pass the apk path as an argument."
     fi
     # Newest matching apk wins
-    input_apk="$(find "$HOME/storage/downloads" -maxdepth 2 -type f \
+    input_apk="$(find -L "$HOME/storage/downloads" -maxdepth 2 -type f \
         \( -iname "*instagram*.apk" -o -iname "ig.apk" \) -printf '%T@ %p\n' 2>/dev/null \
         | sort -rn | head -1 | cut -d' ' -f2-)"
 fi
