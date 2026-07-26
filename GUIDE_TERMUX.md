@@ -34,12 +34,37 @@ Accept the Android permission prompt when it appears.
 
 ```bash
 pkg update -y
-pkg install -y git apktool apksigner openjdk-17
+pkg install -y git openjdk-17 apksigner aapt2 curl
 ```
 
-`zipalign` is optional. If `pkg install zipalign` finds nothing, skip it -
-the build script detects its absence and carries on. Alignment is an
-optimisation, not an install requirement.
+**apktool is not a Termux package.** `pkg install apktool` fails with
+"has no installation candidate" - it is a plain Java jar, so the build script
+downloads the latest release from
+[github.com/iBotPeaches/Apktool](https://github.com/iBotPeaches/Apktool/releases)
+and runs it with `java -jar`. Nothing to do by hand.
+
+If you would rather supply it yourself, drop the jar next to the script as
+`apktool.jar`, or point at it with `APKTOOL_JAR=/path/to/apktool.jar`.
+
+**Why `aapt2` matters.** apktool bundles prebuilt `aapt`/`aapt2` binaries
+compiled for x86_64 Linux. Those cannot execute on an aarch64 Android phone,
+so the rebuild step fails with an "exec format error" unless apktool is handed
+Termux's native `aapt2`. The build script detects it and passes it through
+automatically - you just need the package installed.
+
+`zipalign` is optional. If it is unavailable, skip it - the script detects its
+absence and carries on. Alignment is an optimisation, not an install
+requirement.
+
+### Check your setup before building
+
+```bash
+bash build_termux.sh --check
+```
+
+This prints exactly which tools were found, whether storage access works, which
+apks it can see in Downloads, and how much space is free - without starting the
+slow build. Fix anything reported as `MISSING` first.
 
 ---
 
@@ -103,6 +128,9 @@ first. Back it up somewhere off the phone.
 
 | Symptom | Cause | Fix |
 |---|---|---|
+| `Package 'apktool' has no installation candidate` | apktool is not a Termux package | Nothing to do - the build script fetches the jar itself |
+| `exec format error` / `cannot execute binary file` during rebuild | apktool used its bundled x86 aapt | `pkg install -y aapt2`, then re-run |
+| `No mirror or mirror group selected` | Termux mirror not chosen | Run `termux-change-repo` and pick a nearby mirror |
 | `Could not find an Instagram apk` | Storage permission missing | Run `termux-setup-storage`, or pass the path as an argument |
 | `is a bundle format` | Downloaded `.apkm`/`.xapk`/`.apks` | Re-download the plain APK variant |
 | Rebuild killed with no error | Out of RAM | No on-device fix - use a PC for this step |

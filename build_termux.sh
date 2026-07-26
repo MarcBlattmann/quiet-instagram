@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 #
 # On-device build helper for HealthyIG (Termux / Android).
-# Run with:  bash build_termux.sh [path/to/instagram.apk]
 #
-# If no path is given, the script looks for an Instagram apk in
-# ~/storage/downloads. See GUIDE_TERMUX.md for the full walkthrough.
+#   bash build_termux.sh --check          # report what is installed, build nothing
+#   bash build_termux.sh                  # find an apk in ~/storage/downloads and build
+#   bash build_termux.sh path/to/ig.apk   # build a specific apk
+#
+# apktool is NOT in the Termux package repos. It is a Java jar - this script
+# finds it on PATH, next to itself as apktool.jar, or downloads the latest
+# release from GitHub. Override with:  APKTOOL_JAR=/path/to/apktool.jar
+#
+# See GUIDE_TERMUX.md for the full walkthrough.
 
 set -euo pipefail
 
@@ -13,8 +19,122 @@ work_dir="$repo_dir/ig_plain"
 keystore="$repo_dir/healthyig.jks"
 store_pass="password"
 
-say() { printf '\n>> %s\n' "$*"; }
-die() { printf '\nERROR: %s\n' "$*" >&2; exit 1; }
+say()  { printf '\n>> %s\n' "$*"; }
+warn() { printf '\n!! %s\n' "$*" >&2; }
+die()  { printf '\nERROR: %s\n' "$*" >&2; exit 1; }
+
+###############################################################################
+# Locate apktool
+###############################################################################
+# Sets $APKTOOL to a full command prefix, e.g. "java -jar /path/apktool.jar".
+
+resolve_apktool() {
+    if [ -n "${APKTOOL_JAR:-}" ]; then
+        [ -f "$APKTOOL_JAR" ] || die "APKTOOL_JAR is set but not a file: $APKTOOL_JAR"
+        APKTOOL="java -jar $APKTOOL_JAR"
+        return 0
+    fi
+
+    # A real apktool wrapper on PATH (rare on Termux, normal on desktop Linux)
+    if command -v apktool >/dev/null 2>&1; then
+        APKTOOL="apktool"
+        return 0
+    fi
+
+    local jar
+    for jar in "$repo_dir/apktool.jar" "${PREFIX:-/usr}/share/apktool.jar"; do
+        if [ -f "$jar" ]; then
+            APKTOOL="java -jar $jar"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+download_apktool() {
+    command -v curl >/dev/null 2>&1 || die "curl is needed to download apktool. Run: pkg install -y curl"
+
+    say "apktool not found - fetching the latest release from GitHub ..."
+
+    local url
+    url="$(curl -fsSL https://api.github.com/repos/iBotPeaches/Apktool/releases/latest \
+        | grep -o 'https://[^"]*apktool[^"]*\.jar' | head -1)" || true
+
+    if [ -z "$url" ]; then
+        die "Could not determine the apktool download URL.
+Download the latest apktool_x.y.z.jar manually from
+  https://github.com/iBotPeaches/Apktool/releases
+save it as apktool.jar in $repo_dir, then re-run this script."
+    fi
+
+    curl -fL --progress-bar -o "$repo_dir/apktool.jar" "$url" \
+        || die "Download failed. Fetch $url manually and save it as $repo_dir/apktool.jar"
+
+    APKTOOL="java -jar $repo_dir/apktool.jar"
+    say "apktool saved to $repo_dir/apktool.jar"
+}
+
+###############################################################################
+# Locate aapt2
+###############################################################################
+# apktool ships prebuilt aapt/aapt2 binaries for x86_64 Linux. Those cannot
+# execute on aarch64 Android, so on Termux we must hand apktool the native
+# aapt2 from the aapt2 package. On a desktop the bundled one is fine.
+
+resolve_aapt2() {
+    AAPT_ARGS=()
+    if command -v aapt2 >/dev/null 2>&1; then
+        AAPT_ARGS=(--use-aapt2 -a "$(command -v aapt2)")
+        say "Using native aapt2: $(command -v aapt2)"
+    else
+        warn "aapt2 not found. apktool will fall back to its bundled binary, which
+   does not run on Android (aarch64). If the rebuild step fails with an
+   'aapt' or 'exec format' error, install it with:  pkg install -y aapt2"
+    fi
+}
+
+###############################################################################
+# Environment probe (--check)
+###############################################################################
+
+probe() {
+    printf '\n=== HealthyIG build environment ===\n\n'
+    printf '%-12s %s\n' "arch:" "$(uname -m)"
+    printf '%-12s %s\n' "termux:" "$([ -n "${PREFIX:-}" ] && echo "yes ($PREFIX)" || echo "no")"
+
+    local t
+    for t in java keytool apksigner aapt2 aapt zipalign curl git; do
+        if command -v "$t" >/dev/null 2>&1; then
+            printf '%-12s %s\n' "$t:" "$(command -v "$t")"
+        else
+            printf '%-12s %s\n' "$t:" "MISSING"
+        fi
+    done
+
+    if resolve_apktool; then
+        printf '%-12s %s\n' "apktool:" "$APKTOOL"
+    else
+        printf '%-12s %s\n' "apktool:" "MISSING (will be downloaded on build)"
+    fi
+
+    if [ -d "$HOME/storage/downloads" ]; then
+        printf '%-12s %s\n' "downloads:" "ok"
+        printf '\nCandidate apks in Downloads:\n'
+        find "$HOME/storage/downloads" -maxdepth 2 -type f \
+            \( -iname "*instagram*.apk*" -o -iname "ig.apk" \) 2>/dev/null \
+            | sed 's/^/  /' || true
+    else
+        printf '%-12s %s\n' "downloads:" "MISSING (run termux-setup-storage)"
+    fi
+
+    printf '\nFree space here: %s\n\n' "$(df -h "$repo_dir" | awk 'NR==2 {print $4}')"
+}
+
+if [ "${1:-}" = "--check" ] || [ "${1:-}" = "-c" ]; then
+    probe
+    exit 0
+fi
 
 ###############################################################################
 # 1. Locate the input apk
@@ -49,15 +169,21 @@ say "Using input apk: $input_apk"
 ###############################################################################
 
 missing=()
-for tool in apktool apksigner keytool; do
+for tool in java apksigner keytool; do
     command -v "$tool" >/dev/null 2>&1 || missing+=("$tool")
 done
 
 if [ "${#missing[@]}" -gt 0 ]; then
     printf '\nMissing required tools: %s\n' "${missing[*]}" >&2
-    printf 'Install them with:\n\n  pkg install -y apktool apksigner openjdk-17\n\n' >&2
+    printf 'On Termux, install them with:\n\n  pkg install -y openjdk-17 apksigner aapt2\n\n' >&2
+    printf 'Note: apktool is NOT a Termux package - this script fetches the jar itself.\n\n' >&2
     exit 1
 fi
+
+resolve_apktool || download_apktool
+say "apktool command: $APKTOOL"
+
+resolve_aapt2
 
 # zipalign is optional - the apk installs without it, it is only an optimisation.
 if command -v zipalign >/dev/null 2>&1; then
@@ -73,7 +199,7 @@ fi
 
 say "Decompiling (this is the slow part - expect several minutes)..."
 rm -rf "$work_dir"
-apktool d -r -f -o "$work_dir" "$input_apk"
+$APKTOOL d -r -f -o "$work_dir" "$input_apk"
 
 ###############################################################################
 # 4. Patch the endpoints
@@ -92,7 +218,16 @@ rm -f "$work_dir/script.sh"
 ###############################################################################
 
 say "Rebuilding the apk ..."
-apktool b -r -f "$work_dir"
+if ! $APKTOOL b -r -f "${AAPT_ARGS[@]+"${AAPT_ARGS[@]}"}" "$work_dir"; then
+    die "Rebuild failed.
+If the error mentions aapt / 'exec format error' / 'cannot execute binary file',
+apktool tried to use its bundled x86 aapt. Install the native one and retry:
+
+  pkg install -y aapt2
+
+If the process was killed with no error message, the phone ran out of RAM.
+There is no on-device workaround for that - the rebuild needs a PC."
+fi
 
 built="$work_dir/dist/$(basename "$input_apk")"
 [ -f "$built" ] || built="$(find "$work_dir/dist" -maxdepth 1 -name '*.apk' | head -1)"
