@@ -21,7 +21,9 @@ declare -A replacements
 replacements["\"discover/topical_explore/\""]="\"\""
 
 ### Feed main screen
-replacements["feed/timeline/\""]="\""
+### DISABLED: leaving feed/timeline intact so the normal following feed loads.
+### Re-enable the line below to block the home feed again.
+# replacements["feed/timeline/\""]="\""
 
 ### Feed stories (CAN still upload stories)
 # replacements["\"feed/reels_tray/\""]="\"\""
