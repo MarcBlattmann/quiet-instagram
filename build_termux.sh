@@ -148,14 +148,16 @@ probe() {
 ###############################################################################
 
 resume=0
+hide_reels_tab=0
 positional=()
 
 for arg in "$@"; do
     case "$arg" in
-        --check|-c) probe; exit 0 ;;
-        --resume)   resume=1 ;;
-        -*)         die "Unknown option: $arg" ;;
-        *)          positional+=("$arg") ;;
+        --check|-c)       probe; exit 0 ;;
+        --resume)         resume=1 ;;
+        --hide-reels-tab) hide_reels_tab=1 ;;
+        -*)               die "Unknown option: $arg" ;;
+        *)                positional+=("$arg") ;;
     esac
 done
 
@@ -245,6 +247,16 @@ if [ "$resume" -eq 0 ]; then
     cp "$repo_dir/script.sh" "$work_dir/script.sh"
     ( cd "$work_dir" && bash ./script.sh )
     rm -f "$work_dir/script.sh"
+
+    # Optional bytecode patch: remove the Reels button from the nav bar.
+    # Off by default - it is tied to a specific Instagram build's obfuscated
+    # names, unlike the endpoint patch which survives updates.
+    if [ "$hide_reels_tab" -eq 1 ]; then
+        say "Removing the Reels tab from the navigation bar ..."
+        bash "$repo_dir/patch_navbar.sh" "$work_dir" \
+            || die "Nav-bar patch failed - see above. Rebuild without --hide-reels-tab,
+or re-run recon_navbar.sh against this Instagram version to locate the new names."
+    fi
 fi
 
 ###############################################################################
