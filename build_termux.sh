@@ -10,7 +10,7 @@
 # finds it on PATH, next to itself as apktool.jar, or downloads the latest
 # release from GitHub. Override with:  APKTOOL_JAR=/path/to/apktool.jar
 #
-# See GUIDE_TERMUX.md for the full walkthrough.
+# See README.md for the full walkthrough.
 
 set -euo pipefail
 
