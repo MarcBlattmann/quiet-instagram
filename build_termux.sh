@@ -148,14 +148,15 @@ probe() {
 ###############################################################################
 
 resume=0
-hide_reels_tab=0
+hide_reels_tab=1   # on by default; --keep-reels-tab opts out
 positional=()
 
 for arg in "$@"; do
     case "$arg" in
         --check|-c)       probe; exit 0 ;;
         --resume)         resume=1 ;;
-        --hide-reels-tab) hide_reels_tab=1 ;;
+        --hide-reels-tab) hide_reels_tab=1 ;;   # kept for explicitness
+        --keep-reels-tab) hide_reels_tab=0 ;;
         -*)               die "Unknown option: $arg" ;;
         *)                positional+=("$arg") ;;
     esac
@@ -258,9 +259,20 @@ fi
 # paying for another decompile.
 if [ "$hide_reels_tab" -eq 1 ]; then
     say "Removing the Reels tab from the navigation bar ..."
-    bash "$repo_dir/patch_navbar.sh" "$work_dir" \
-        || die "Nav-bar patch failed - see above. Rebuild without --hide-reels-tab,
-or re-run recon_navbar.sh against this Instagram version to locate the new names."
+    if ! bash "$repo_dir/patch_navbar.sh" "$work_dir"; then
+        # Warn and carry on rather than abort. This runs by default, and after
+        # an hour of decompiling, a working Instagram with the tab still showing
+        # beats no apk at all. The endpoint patches are unaffected.
+        warn "NAV-BAR PATCH SKIPPED - the Reels tab will still be visible.
+
+   The build continues and the apk will work; only the tab icon remains.
+   Reels, Explore and chaining are still blocked - those are endpoint
+   patches and are unaffected by this.
+
+   This usually means Instagram's obfuscated names moved in a new version.
+   Run 'bash recon_navbar.sh ig_full' to locate them again, or pass
+   --keep-reels-tab to skip this step deliberately."
+    fi
 fi
 
 ###############################################################################

@@ -68,7 +68,7 @@ for old in "${!replacements[@]}"; do
 done
 
 # Draw a progress bar. Redraws in place on a terminal; falls back to periodic
-# lines when the output is a log file, so auto_update.log doesn't fill up with
+# lines when the output is redirected, so a log file doesn't fill up with
 # carriage returns.
 #
 # The bar is sized to the terminal. This matters on a phone: \r returns to the

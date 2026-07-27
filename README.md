@@ -47,39 +47,24 @@ rebuild step may run out of memory, which has no on-device workaround.
 If the rebuild fails after decompiling, `bash build_termux.sh --resume`
 retries just that step instead of starting over.
 
+The Reels button is removed from the bottom navigation bar by default. Pass
+`--keep-reels-tab` to leave it in place.
+
 ## Keep the signing key
 
 `healthyig.jks` is generated on the first build. Back it up. Signing a later
 build with a different key makes Android treat it as a different app, forcing
 an uninstall and losing your local data.
 
-## Rebuild automatically on new versions
+## Updating to a new Instagram version
 
-`auto_update.sh` watches Downloads for a newer apk and rebuilds unattended.
+Download the new apk from APKMirror into Downloads and run `bash
+build_termux.sh` again. It picks up the newest Instagram apk it finds.
 
-```bash
-pkg install -y cronie termux-api
-crontab -e
-```
-
-```
-0 3 * * * bash ~/quiet-instagram/auto_update.sh
-```
-
-To survive reboots, install the Termux:Boot app and add:
-
-```bash
-mkdir -p ~/.termux/boot
-printf '#!%s/bin/sh\ntermux-wake-lock\ncrond\n' "$PREFIX" > ~/.termux/boot/start-crond.sh
-chmod +x ~/.termux/boot/start-crond.sh
-```
-
-It only builds when the apk in Downloads differs from the last one built, waits
-until the phone is charging, and notifies you when the result is ready.
-Check it with `bash auto_update.sh --status` or `tail -f auto_update.log`.
-
-Downloading the apk and installing the result stay manual - APKMirror blocks
-automated downloads, and Android requires a tap to install without root.
+The endpoint patches are string replacements and survive updates. The nav-bar
+patch is bytecode and is tied to one build's obfuscated names - if those move,
+the build warns, skips that step and still produces a working apk. Run
+`bash recon_navbar.sh ig_full` to find the new names when that happens.
 
 ## Which endpoints get blocked
 
