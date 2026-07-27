@@ -247,16 +247,20 @@ if [ "$resume" -eq 0 ]; then
     cp "$repo_dir/script.sh" "$work_dir/script.sh"
     ( cd "$work_dir" && bash ./script.sh )
     rm -f "$work_dir/script.sh"
+fi
 
-    # Optional bytecode patch: remove the Reels button from the nav bar.
-    # Off by default - it is tied to a specific Instagram build's obfuscated
-    # names, unlike the endpoint patch which survives updates.
-    if [ "$hide_reels_tab" -eq 1 ]; then
-        say "Removing the Reels tab from the navigation bar ..."
-        bash "$repo_dir/patch_navbar.sh" "$work_dir" \
-            || die "Nav-bar patch failed - see above. Rebuild without --hide-reels-tab,
+# Optional bytecode patch: remove the Reels button from the nav bar. Off by
+# default - it is tied to a specific Instagram build's obfuscated names, unlike
+# the endpoint patch which survives updates.
+#
+# Deliberately outside the resume guard: patch_navbar.sh is idempotent, so
+# --resume --hide-reels-tab can apply it to an already-decompiled tree without
+# paying for another decompile.
+if [ "$hide_reels_tab" -eq 1 ]; then
+    say "Removing the Reels tab from the navigation bar ..."
+    bash "$repo_dir/patch_navbar.sh" "$work_dir" \
+        || die "Nav-bar patch failed - see above. Rebuild without --hide-reels-tab,
 or re-run recon_navbar.sh against this Instagram version to locate the new names."
-    fi
 fi
 
 ###############################################################################

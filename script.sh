@@ -70,14 +70,41 @@ done
 # Draw a progress bar. Redraws in place on a terminal; falls back to periodic
 # lines when the output is a log file, so auto_update.log doesn't fill up with
 # carriage returns.
+#
+# The bar is sized to the terminal. This matters on a phone: \r returns to the
+# start of the current line, so if the line is wider than the terminal it wraps
+# and every redraw leaves another wrapped line behind - hundreds of them.
+term_cols=$(tput cols 2>/dev/null || echo "${COLUMNS:-80}")
+case "$term_cols" in ''|*[!0-9]*) term_cols=80 ;; esac
+[ "$term_cols" -lt 20 ] && term_cols=20
+
+last_pct_drawn=-1
+
 draw_progress() {
-    local cur=$1 tot=$2 width=40 pct filled bar
+    local cur=$1 tot=$2 pct suffix width filled bar
     [ "$tot" -gt 0 ] || return 0
     [ "$cur" -gt "$tot" ] && cur=$tot
     pct=$(( cur * 100 / tot ))
+
+    # Redraw only when the percentage actually changes, not once per batch.
+    [ "$pct" -eq "$last_pct_drawn" ] && return 0
+    last_pct_drawn=$pct
+
+    suffix=$(printf '%3d%% %d/%d' "$pct" "$cur" "$tot")
+    # 2 leading spaces + "[" + "] " + a column of headroom
+    width=$(( term_cols - ${#suffix} - 6 ))
+
+    # Too narrow for a bar - show just the numbers rather than wrapping.
+    if [ "$width" -lt 8 ]; then
+        printf '\r  %s\033[K' "$suffix"
+        return 0
+    fi
+    [ "$width" -gt 40 ] && width=40
+
     filled=$(( cur * width / tot ))
     bar=$(printf '%*s' "$filled" '' | tr ' ' '#')
-    printf '\r  [%-*s] %3d%%  %d/%d files' "$width" "$bar" "$pct" "$cur" "$tot"
+    # \033[K clears any leftovers from a previous, longer line.
+    printf '\r  [%-*s] %s\033[K' "$width" "$bar" "$suffix"
 }
 
 echo "Replacing endpoints in $file_count files..."

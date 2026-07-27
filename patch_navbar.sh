@@ -58,16 +58,26 @@ fi
 # Each of these is a thing the patch depends on. If any moved, the edit would
 # either not apply or apply in the wrong place, so bail instead.
 
-method_re='^\.method public final A04\(Lcom/instagram/common/session/UserSession;Z\)Ljava/util/List;'
+# Matched as literal strings, never as regexes. Smali signatures are full of
+# ( ) . / $ and passing them through regex - especially via awk -v, which
+# processes escapes before the pattern is compiled - silently mangles them.
+sig='A04(Lcom/instagram/common/session/UserSession;Z)Ljava/util/List;'
+namecall='LX/00TK;->A04(Lcom/instagram/common/session/UserSession;I)Ljava/lang/String;'
 
-grep -qE "$method_re" "$target" \
+grep -qF "$sig" "$target" \
     || die "A04(UserSession, boolean) not found in ${target#$tree/} - obfuscated names have shifted."
 
-body="$(awk "/$( printf '%s' "$method_re" | sed 's|/|\\/|g' )/,/^\.end method/" "$target")"
+body="$(awk -v sig="$sig" '
+    index($0, ".method") == 1 && index($0, sig) > 0 { inm = 1 }
+    inm { print }
+    inm && index($0, ".end method") == 1 { exit }
+' "$target")"
 
-printf '%s' "$body" | grep -q 'LX/00TK;->A04(Lcom/instagram/common/session/UserSession;I)Ljava/lang/String;' \
+[ -n "$body" ] || die "Could not extract the body of A04 from ${target#$tree/}."
+
+printf '%s' "$body" | grep -qF "$namecall" \
     || die "The name-resolution call is missing from A04 - loop structure changed."
-printf '%s' "$body" | grep -q ':cond_2' \
+printf '%s' "$body" | grep -qF ':cond_2' \
     || die "Loop label :cond_2 is missing from A04 - cannot place the skip branch."
 
 # The name we match on must still exist in the id->name mapping, or we would
@@ -95,17 +105,17 @@ say 'Verified: A04 loop, :cond_2 label, and the "clips" identifier all present.'
 
 tmp="$(mktemp)"
 
-awk -v mre="$method_re" '
+awk -v sig="$sig" -v namecall="$namecall" '
     { print }
 
-    !inm && $0 ~ mre { inm = 1; next }
+    !inm && index($0, ".method") == 1 && index($0, sig) > 0 { inm = 1; next }
 
     inm && !done {
-        if ($0 ~ /LX\/00TK;->A04\(Lcom\/instagram\/common\/session\/UserSession;I\)Ljava\/lang\/String;/) {
+        if (index($0, namecall) > 0) {
             armed = 1
             next
         }
-        if (armed && $0 ~ /move-result-object v0/) {
+        if (armed && index($0, "move-result-object v0") > 0) {
             print ""
             print "    # HEALTHYIG-NAVBAR-PATCH: skip the Reels tab"
             print "    const-string/jumbo v1, \"clips\""
@@ -122,7 +132,7 @@ awk -v mre="$method_re" '
         }
     }
 
-    inm && /^\.end method/ { inm = 0 }
+    inm && index($0, ".end method") == 1 { inm = 0 }
 
     END { if (!done) exit 1 }
 ' "$target" > "$tmp"
