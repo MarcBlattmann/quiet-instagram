@@ -67,16 +67,45 @@ for old in "${!replacements[@]}"; do
     echo "s|$old|$new|g" >> "$sed_script"
 done
 
-# Check if tqdm is installed for progress tracking
-if command -v tqdm &> /dev/null; then
-    echo "Processing $file_count files with tqdm progress..."
-    # Use tqdm for progress and xargs for parallel execution
-    printf "%s\n" "${files[@]}" | tqdm --total=$file_count --desc "Replacing Endpoints" | xargs -I {} sed -i -f "$sed_script" "{}"
-else
-    echo "tqdm not installed. Running without progress bar."
-    # Process files without tqdm
-    xargs -a <(printf "%s\n" "${files[@]}") -I {} sed -i -f "$sed_script" "{}"
-fi
+# Draw a progress bar. Redraws in place on a terminal; falls back to periodic
+# lines when the output is a log file, so auto_update.log doesn't fill up with
+# carriage returns.
+draw_progress() {
+    local cur=$1 tot=$2 width=40 pct filled bar
+    [ "$tot" -gt 0 ] || return 0
+    [ "$cur" -gt "$tot" ] && cur=$tot
+    pct=$(( cur * 100 / tot ))
+    filled=$(( cur * width / tot ))
+    bar=$(printf '%*s' "$filled" '' | tr ' ' '#')
+    printf '\r  [%-*s] %3d%%  %d/%d files' "$width" "$bar" "$pct" "$cur" "$tot"
+}
+
+echo "Replacing endpoints in $file_count files..."
+
+# One sed per batch rather than one per file. On a decompiled Instagram that is
+# a few hundred processes instead of ~180,000, which is most of the runtime.
+batch=500
+i=0
+last_decile=-1
+
+while [ "$i" -lt "$file_count" ]; do
+    sed -i -f "$sed_script" "${files[@]:i:batch}"
+    i=$(( i + batch ))
+
+    if [ -t 1 ]; then
+        draw_progress "$i" "$file_count"
+    else
+        # Non-interactive: one line per 10% instead of a redrawing bar.
+        cur=$i; [ "$cur" -gt "$file_count" ] && cur=$file_count
+        pct=$(( cur * 100 / file_count ))
+        if [ $(( pct / 10 )) -ne "$last_decile" ]; then
+            last_decile=$(( pct / 10 ))
+            echo "  ${pct}%  (${cur}/${file_count} files)"
+        fi
+    fi
+done
+
+[ -t 1 ] && echo
 
 # Clean up temporary sed script
 rm "$sed_script"
