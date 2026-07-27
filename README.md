@@ -31,8 +31,8 @@ Download the Instagram apk from APKMirror - **arm64-v8a**, and the **APK**
 variant, not BUNDLE or XAPK. Leave it in Downloads.
 
 ```bash
-git clone <this repo>
-cd <this repo>
+git clone https://github.com/MarcBlattmann/quiet-instagram.git
+cd quiet-instagram
 bash build_termux.sh --check    # verify the toolchain first
 bash build_termux.sh
 ```
@@ -63,7 +63,7 @@ crontab -e
 ```
 
 ```
-0 3 * * * bash ~/<this repo>/auto_update.sh
+0 3 * * * bash ~/quiet-instagram/auto_update.sh
 ```
 
 To survive reboots, install the Termux:Boot app and add:
