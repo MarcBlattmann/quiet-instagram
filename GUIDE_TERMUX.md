@@ -124,6 +124,83 @@ first. Back it up somewhere off the phone.
 
 ---
 
+## Automating rebuilds for new Instagram versions
+
+`auto_update.sh` watches Downloads for a new Instagram apk and rebuilds
+HealthyIG from it unattended. Two steps stay manual and cannot be automated on
+an unrooted phone:
+
+- **Downloading the apk.** APKMirror is Cloudflare-gated and its terms forbid
+  automated downloading.
+- **Installing the result.** Android requires a user tap for every install
+  unless the device is rooted or the installer is a device owner.
+
+So the loop becomes: you download the apk when you feel like it, the phone
+rebuilds overnight, and you tap to install in the morning.
+
+### Setup
+
+```bash
+pkg install -y cronie termux-api
+```
+
+Also install the **Termux:API** and **Termux:Boot** companion apps from the
+same source as Termux (F-Droid). Termux:API powers the notifications and the
+charging check; Termux:Boot restarts cron after a reboot.
+
+Start cron at boot:
+
+```bash
+mkdir -p ~/.termux/boot
+cat > ~/.termux/boot/start-crond.sh <<'EOF'
+#!/data/data/com.termux/files/usr/bin/sh
+termux-wake-lock
+crond
+EOF
+chmod +x ~/.termux/boot/start-crond.sh
+```
+
+Add the job with `crontab -e`:
+
+```
+0 3 * * * bash ~/HealthyIG---with-Feed/auto_update.sh
+```
+
+Then start cron for this session without rebooting: `crond`
+
+### How it behaves
+
+- Runs at 03:00 daily. On a tick with nothing new it exits in milliseconds and
+  writes nothing to the log.
+- A build only starts if the newest apk in Downloads differs from the last one
+  built (tracked in `.last_built` as basename + byte size).
+- It defers while the phone is on battery and notifies you to plug in - the
+  rebuild pegs every core for hours.
+- It holds a lock directory so a second tick can never start a parallel build
+  and corrupt `ig_plain`.
+- It takes a wake lock for the duration and releases it on exit, including on
+  failure.
+- You get a notification when the build starts and when the apk is ready.
+
+### Checking on it
+
+```bash
+bash auto_update.sh --status    # newest apk, last built, lock state
+tail -f auto_update.log         # watch a build in progress
+bash auto_update.sh --force     # rebuild the current apk anyway
+```
+
+If a build fails, the decompiled tree is left in place - resume it with
+`bash build_termux.sh --resume` rather than starting over.
+
+### Signing key
+
+Every rebuild is signed with `healthyig.jks`, generated on the first build.
+Keep it. Signing with a different key makes Android treat the result as a
+different app, forcing an uninstall and losing your local data.
+
+---
+
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
