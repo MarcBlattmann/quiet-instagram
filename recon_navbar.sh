@@ -49,6 +49,27 @@ find "$tree" -name '*.smali' \( \
     \) 2>/dev/null | head -"$cap"
 
 ###############################################################################
+# 1b. Packages that survived obfuscation, matched by PATH
+###############################################################################
+# R8 obfuscates most classes into X/0xxx.smali but leaves some packages intact.
+# com/instagram/mainactivity/maintab/ is the bottom tab bar - matching on the
+# directory catches siblings whose own filenames give nothing away.
+
+section "smali under main-tab / navigation packages (by path)"
+printf 'total files under those packages: %s\n' \
+    "$(find "$tree" -name '*.smali' \( -path '*/mainactivity/*' -o -path '*/maintab/*' \) 2>/dev/null | wc -l)"
+find "$tree" -name '*.smali' \( -path '*/mainactivity/*' -o -path '*/maintab/*' \) 2>/dev/null \
+    | sed "s|^$tree/||" | sort | head -60
+
+###############################################################################
+# 1c. Where the tab identifier literals actually live
+###############################################################################
+
+section "files containing the clips_tab / reels_tab literals"
+grep -rl '"clips_tab"\|"reels_tab"\|"clips_tab_home"' "$tree" --include='*.smali' 2>/dev/null \
+    | sed "s|^$tree/||" | head -"$cap"
+
+###############################################################################
 # 2. Tab identifier strings
 ###############################################################################
 # Tabs are usually keyed by short string constants for analytics/logging. These
