@@ -4,4 +4,5 @@ apktool.jar
 ig_plain/
 ig_full/
 install.apk
+install.apk.idsig
 *.jks

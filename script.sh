@@ -29,6 +29,12 @@ replacements["\"discover/topical_explore/\""]="\"\""
 # replacements["\"feed/reels_tray/\""]="\"\""
 
 ### Reels
+#
+# Two endpoints must stay intact here, or patch_thread_reels.sh has nothing to
+# page through - "clips/direct_thread_clips/" (the reels in one DM thread) and
+# "clips/items/" (hydrating a list of media ids). Neither is a discovery
+# surface: both only return media somebody deliberately sent you. Do not add
+# a bare "clips/" line - it matches those too.
 replacements["\"clips/discover/\""]="\"\""
 # clips/discover/social removes reels liked by friends
 replacements["\"clips/discover/social/\""]="\"\"" 

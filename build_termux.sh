@@ -6,6 +6,13 @@
 #   bash build_termux.sh                  # find an apk in ~/storage/downloads and build
 #   bash build_termux.sh path/to/ig.apk   # build a specific apk
 #
+#   --keep-reels-tab       leave the Reels button in the nav bar (removed by default)
+#   --no-thread-reels      do not patch the DM reel viewer (patch_thread_reels.sh)
+#   --no-dead-scroll-fix   leave the never-loading page at the end of the viewer
+#                          scrollable (patch_no_dead_scroll.sh)
+#   --no-reply-bar-fix     leave the reply bar tied to the reel you opened
+#                          (patch_reply_bar.sh)
+#
 # apktool is NOT in the Termux package repos. It is a Java jar - this script
 # finds it on PATH, next to itself as apktool.jar, or downloads the latest
 # release from GitHub. Override with:  APKTOOL_JAR=/path/to/apktool.jar
@@ -149,16 +156,23 @@ probe() {
 
 resume=0
 hide_reels_tab=1   # on by default; --keep-reels-tab opts out
+thread_reels=1
+dead_scroll_fix=1
+reply_bar_fix=1
 positional=()
 
 for arg in "$@"; do
     case "$arg" in
-        --check|-c)       probe; exit 0 ;;
-        --resume)         resume=1 ;;
-        --hide-reels-tab) hide_reels_tab=1 ;;   # kept for explicitness
-        --keep-reels-tab) hide_reels_tab=0 ;;
-        -*)               die "Unknown option: $arg" ;;
-        *)                positional+=("$arg") ;;
+        --check|-c)             probe; exit 0 ;;
+        --resume)               resume=1 ;;
+        --hide-reels-tab)       hide_reels_tab=1 ;;   # kept for explicitness
+        --keep-reels-tab)       hide_reels_tab=0 ;;
+        --thread-reels)         thread_reels=1 ;;
+        --no-thread-reels)      thread_reels=0 ;;
+        --no-dead-scroll-fix)   dead_scroll_fix=0 ;;
+        --no-reply-bar-fix)     reply_bar_fix=0 ;;
+        -*)                     die "Unknown option: $arg" ;;
+        *)                      positional+=("$arg") ;;
     esac
 done
 
@@ -273,6 +287,37 @@ if [ "$hide_reels_tab" -eq 1 ]; then
    Run 'bash recon_navbar.sh ig_full' to locate them again, or pass
    --keep-reels-tab to skip this step deliberately."
     fi
+fi
+
+# Bytecode patch: make a reel opened from a DM scroll through every reel in that
+# conversation instead of showing one and stopping. On by default - it is the
+# one thing here that adds rather than removes, and it is what most people open
+# DMs for. Same idempotency note as above: outside the resume guard on purpose.
+if [ "$thread_reels" -eq 1 ]; then
+    say "Enabling scroll-through-the-whole-thread for reels sent in DMs ..."
+    bash "$repo_dir/patch_thread_reels.sh" "$work_dir" \
+        || die "DM thread reels patch failed - see above. Rebuild with --no-thread-reels
+to skip it, or re-run the checks in patch_thread_reels.sh against this Instagram
+version to find where the names moved."
+fi
+
+# Bytecode patch: the reply bar belongs to the message you tapped, so Instagram
+# hides it on every other reel. Point it at the reel on screen instead. Must run
+# after patch_thread_reels.sh - it calls into the class that installs.
+if [ "$reply_bar_fix" -eq 1 ] && [ "$thread_reels" -eq 1 ]; then
+    say "Keeping the reply bar on the reel you are watching ..."
+    bash "$repo_dir/patch_reply_bar.sh" "$work_dir" \
+        || die "Reply-bar patch failed - see above. Rebuild with --no-reply-bar-fix
+to skip it."
+fi
+
+# Bytecode patch: with the discovery endpoints blanked, the viewer still lets you
+# swipe onto a placeholder page that never loads. Stop at the last real reel.
+if [ "$dead_scroll_fix" -eq 1 ]; then
+    say "Making the reel viewer stop at the last reel instead of a dead page ..."
+    bash "$repo_dir/patch_no_dead_scroll.sh" "$work_dir" \
+        || die "Dead-scroll patch failed - see above. Rebuild with --no-dead-scroll-fix
+to skip it."
 fi
 
 ###############################################################################
